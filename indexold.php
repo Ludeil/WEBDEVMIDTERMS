@@ -11,14 +11,7 @@ $pageTitle = 'Obeda Dormitories';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/header.css">
-    <link rel="stylesheet" href="assets/css/home.css">
-    <link rel="stylesheet" href="assets/css/about.css">
-    <link rel="stylesheet" href="assets/css/rooms.css">
-    <link rel="stylesheet" href="assets/css/gallery.css">
-    <link rel="stylesheet" href="assets/css/contact.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -34,9 +27,9 @@ $pageTitle = 'Obeda Dormitories';
         <a href="#contact">Contact &amp; Location</a>
     </nav>
     <div class="account-nav">
-        <a href="login.php">Sign in</a>
-        <a class="signup" href="signup.php">Sign up</a>
-        <a class="user-icon" href="login.php" aria-label="Account"><img src="assets/images/user-dark.svg" alt="user logo"></a>
+        <a href="#signin">Sign in</a>
+        <a class="signup" href="#signup">Sign up</a>
+        <button class="user-icon" type="button" aria-label="Account"><img src="assets/images/user-dark.svg" alt="user logo"></button>
     </div>
 </header>
 
@@ -89,9 +82,9 @@ $pageTitle = 'Obeda Dormitories';
             <div class="cert-card"><img src="assets/images/cert-bfp-image.jpg" alt="Certification FIREEE"></div> 
         </div>
         <div class="cta-row about-cta">
-            <a class="cta-btn" href="login.php">Schedule Viewing</a>
+            <a class="cta-btn" href="#contact">Schedule Viewing</a>
             <span class="or">or</span>
-            <a class="cta-btn" href="login.php">Rent a Room</a>
+            <a class="cta-btn" href="#rooms">Rent a Room</a>
         </div>
     </section>
 
@@ -118,9 +111,9 @@ $pageTitle = 'Obeda Dormitories';
             <div class="communal-copy">
                 <h2>Communal Kitchen and<br>Bathroom</h2>
                 <div class="cta-row communal-cta">
-                    <a class="cta-btn small" href="login.php">Schedule Viewing</a>
+                    <a class="cta-btn small" href="#contact">Schedule Viewing</a>
                     <span class="or">or</span>
-                    <a class="cta-btn small" href="login.php">Rent a Room</a>
+                    <a class="cta-btn small" href="#rooms">Rent a Room</a>
                 </div>
             </div>
         </div>
@@ -145,9 +138,9 @@ $pageTitle = 'Obeda Dormitories';
 
         <h3>JOIN THE LEGENDS NOW!</h3>
         <div class="cta-row gallery-cta">
-            <a class="cta-btn" href="login.php">Schedule Viewing</a>
+            <a class="cta-btn" href="#contact">Schedule Viewing</a>
             <span class="or">or</span>
-            <a class="cta-btn" href="login.php">Rent a Room</a>
+            <a class="cta-btn" href="#rooms">Rent a Room</a>
         </div>
     </section>
 

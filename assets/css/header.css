@@ -1,0 +1,114 @@
+.site-header {
+  width: 100%;
+  max-width: var(--section-max);
+  height: 100px;
+  margin: 0 auto;
+  background: var(--charcoal);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr 3.5fr 1.4fr;
+  align-items: center;
+  padding: 0 66px 0 78px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  width: 76px;
+}
+.header-logo img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+}
+.main-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 44px;
+  height: 100%;
+}
+.main-nav a {
+  font-size: 19px;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-top: 5px;
+}
+.main-nav a.active {
+  position: relative;
+}
+.main-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -21px;
+  height: 4px;
+  background: #fff;
+}
+.account-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 25px;
+  font-size: 19px;
+  white-space: nowrap;
+}
+.signup {
+  background: #fff;
+  color: var(--charcoal);
+  border-radius: 17px;
+  padding: 7px 28px;
+}
+.user-icon {
+  width: 62px;
+  height: 62px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.user-icon img {
+  width: 62px;
+  height: 62px;
+}
+
+.photo,
+.brand-image,
+.story-bg,
+.cert-card img,
+.gallery-slide,
+.contact-heading img,
+.contact-social-heading img,
+.social-item img,
+.footer-social-item img,
+.footer-user {
+  object-fit: contain;
+}
+
+/* Reusable fixed-ratio image replacement behavior */
+.photo {
+  object-fit: cover;
+}
+.cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+}
+.cta-btn {
+  width: 290px;
+  height: 100px;
+  border-radius: 11px;
+  background: var(--charcoal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+.or {
+  font-size: 18px;
+  font-weight: 600;
+}

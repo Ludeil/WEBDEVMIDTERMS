@@ -1,0 +1,74 @@
+/* PAGE 2 */
+.about-page {
+  background: #fff;
+}
+.about-copy {
+  position: absolute;
+  left: 75px;
+  top: 55px;
+}
+.about-copy h2 {
+  font-size: 51px;
+  line-height: 1.08;
+  margin: 0;
+  font-weight: 800;
+}
+.about-lead {
+  font-size: 31px;
+  line-height: 1.15;
+  font-weight: 700;
+  margin: 133px 0 0;
+}
+.cert-list {
+  position: absolute;
+  top: 615px;
+  left: 3px;
+  width: 785px;
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 600;
+  margin: 0;
+}
+.cert-panel {
+  position: absolute;
+  left: 860px;
+  top: 282px;
+  width: 925px;
+  height: 250px;
+  border-radius: 39px;
+  background: var(--charcoal);
+  padding: 29px 72px;
+  display: flex;
+  align-items: center;
+  gap: 100px;
+}
+.cert-card {
+  width: 190px;
+  height: 190px;
+  overflow: hidden;
+  border-radius: 39px;
+  background: #fff;
+  flex: 0 0 auto;
+}
+.cert-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* .see-more {
+  color: #fff;
+  font-size: 17px;
+  margin-left: auto;
+  white-space: nowrap;
+} */
+.about-cta {
+  position: absolute;
+  left: 860px;
+  right: 65px;
+  bottom: 99px;
+  gap: 45px;
+}
+.about-cta .cta-btn {
+  width: 290px;
+  height: 102px;
+}

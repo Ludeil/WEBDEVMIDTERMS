@@ -1,0 +1,48 @@
+UPDATE YOUR EXISTING HOMEPAGE HEADER
+
+In your existing index.php, change these three controls:
+
+1. Sign in:
+   FROM:
+   <a href="#signin">Sign in</a>
+
+   TO:
+   <a href="login.php">Sign in</a>
+
+2. Sign up:
+   FROM:
+   <a class="signup" href="#signup">Sign up</a>
+
+   TO:
+   <a class="signup" href="signup.php">Sign up</a>
+
+3. Avatar icon:
+   The current avatar is a button without a destination. Replace it with:
+   <a class="user-icon" href="login.php" aria-label="Account">
+       <img src="assets/images/user-dark.svg" alt="user logo">
+   </a>
+
+To make the avatar keep the same appearance, the existing .user-icon CSS can remain,
+but add this one rule if needed:
+
+.user-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+RECOMMENDED CTA FLOW
+
+Your current homepage contains repeated:
+- Schedule Viewing
+- Rent a Room
+
+Because those actions are account-related, you can make them go to login.php first.
+Then, after successful authentication, login_process.php can later redirect the user to
+the specific viewing or rental page.
+
+For the moment, use:
+<a class="cta-btn" href="login.php">Schedule Viewing</a>
+<a class="cta-btn" href="login.php">Rent a Room</a>
+
+This gives you the account gate you described for the website.

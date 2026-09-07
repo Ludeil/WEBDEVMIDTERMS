@@ -1,0 +1,156 @@
+/* PAGE 5 */
+.contact-page {
+  min-height: 1080px;
+  background: #fff;
+}
+.contact-top {
+  height: 585px;
+  position: relative;
+  background: linear-gradient(90deg, #696969 0%, #f1f1f1 50%, #9a9a9a 100%);
+  overflow: hidden;
+}
+.contact-top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image: url("../images/watermark-placeholder.svg");
+  background-repeat: repeat;
+  background-size: 125px 125px;
+}
+.contact-locations {
+  position: absolute;
+  left: 95px;
+  top: 91px;
+  z-index: 2;
+}
+.contact-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.contact-heading img {
+  width: 66px;
+  height: 91px;
+  margin-top: 0;
+  object-fit: contain;
+}
+.contact-heading h2 {
+  margin: 0;
+  font-size: 47px;
+  line-height: 1.06;
+  font-weight: 800;
+}
+.locations-list {
+  margin: 45px 0 0 28px;
+  font-size: 37px;
+  line-height: 1.38;
+  font-weight: 500;
+}
+.locations-list div::before {
+  content: "";
+  display: inline-block;
+  width: 29px;
+  height: 38px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  background: url("../images/location-placeholder.png") center / contain
+    no-repeat;
+}
+.contact-social {
+  position: absolute;
+  right: 145px;
+  top: 133px;
+  z-index: 2;
+  width: 520px;
+}
+.contact-social-heading {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 25px;
+}
+.contact-social-heading h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+.contact-social-heading img {
+  width: 77px;
+  height: 80px;
+}
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-top: 23px;
+}
+.social-item img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+}
+.social-item strong {
+  font-size: 18px;
+}
+.site-footer {
+  height: 495px;
+  background: var(--charcoal);
+  color: #fff;
+  position: relative;
+  display: grid;
+  grid-template-columns: 30% 31% 39%;
+  padding: 70px 70px 40px 84px;
+}
+.footer-brand {
+  position: relative;
+}
+.footer-user {
+  width: 60px;
+  height: 60px;
+}
+.brand-footer {
+  width: 357px;
+  height: 100px;
+  margin-top: 77px;
+}
+.footer-copy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  border-right: 1px solid #555;
+  padding-right: 45px;
+}
+.footer-copy-grid p {
+  margin: 0 0 27px;
+  font-size: 18px;
+  line-height: 1.15;
+}
+.footer-social {
+  display: flex;
+  justify-content: space-around;
+  gap: 45px;
+  padding-left: 80px;
+}
+.footer-social-item {
+  text-align: center;
+}
+.footer-social-item img {
+  width: 96px;
+  height: 96px;
+  margin: 5px auto 41px;
+}
+.footer-social-item p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.32;
+}
+.footer-bottom {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+}
+

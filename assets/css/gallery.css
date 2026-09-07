@@ -1,0 +1,120 @@
+/* PAGE 4 */
+.gallery-page {
+  background: #fff;
+}
+.watermark-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.33;
+  background-image: url("../images/watermark-placeholder.svg");
+  background-repeat: repeat;
+  background-size: 125px 125px;
+}
+.gallery-page > h2 {
+  position: relative;
+  z-index: 2;
+  margin: 58px auto 0;
+  text-align: center;
+  font-size: 52px;
+  line-height: 1.08;
+  font-weight: 800;
+}
+.gallery-stage {
+  position: relative;
+  z-index: 3;
+  width: 1000px;
+  height: 470px;
+  margin: 55px auto 0;
+}
+.gallery-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.gallery-slide {
+  position: absolute;
+  object-fit: cover;
+  border-radius: 43px;
+  box-shadow: 0 7px 12px rgba(0, 0, 0, 0.17);
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease,
+    z-index 0.35s;
+}
+.gallery-slide.far-left {
+  width: 390px;
+  height: 330px;
+  left: -130px;
+  top: 88px;
+  opacity: 0.28;
+  z-index: 1;
+}
+.gallery-slide.left {
+  width: 430px;
+  height: 380px;
+  left: 140px;
+  top: 40px;
+  opacity: 0.47;
+  z-index: 2;
+}
+.gallery-slide.center {
+  width: 430px;
+  height: 430px;
+  left: 285px;
+  top: 0;
+  opacity: 1;
+  z-index: 5;
+}
+.gallery-slide.right {
+  width: 430px;
+  height: 380px;
+  right: 140px;
+  top: 40px;
+  opacity: 0.47;
+  z-index: 2;
+}
+.gallery-slide.far-right {
+  width: 390px;
+  height: 330px;
+  right: -130px;
+  top: 88px;
+  opacity: 0.28;
+  z-index: 1;
+}
+.gallery-arrow {
+  position: absolute;
+  top: 181px;
+  z-index: 10;
+  width: 68px;
+  height: 68px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: var(--charcoal);
+  color: #fff;
+  cursor: pointer;
+  font-size: 61px;
+  line-height: 45px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 5px rgba(45, 45, 45, 0.12);
+}
+.gallery-arrow.prev {
+  left: 275px;
+}
+.gallery-arrow.next {
+  right: 275px;
+}
+.gallery-page > h3 {
+  position: relative;
+  z-index: 2;
+  margin: 34px 0 0;
+  text-align: center;
+  font-size: 53px;
+  font-weight: 800;
+}
+.gallery-cta {
+  position: relative;
+  z-index: 2;
+  margin-top: 28px;
+}
+

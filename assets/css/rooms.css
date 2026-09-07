@@ -1,0 +1,95 @@
+/* PAGE 3 */
+.rooms-page {
+  background: #fff;
+}
+.bedspace-row {
+  height: 395px;
+  display: flex;
+  gap: 35px;
+  padding: 55px 0 0 101px;
+}
+.bedspace-photo {
+  width: 425px;
+  height: 323px;
+  border-radius: 34px;
+}
+.bedspace-copy {
+  padding-top: 9px;
+}
+.bedspace-copy h2 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 800;
+}
+.bedspace-copy p {
+  margin: 50px 0 0;
+  font-size: 28px;
+  line-height: 1.02;
+  font-weight: 500;
+}
+.female-band {
+  height: 424px;
+  background: linear-gradient(90deg, #fff 0%, #cfcfcf 35%, #858585 100%);
+  position: relative;
+}
+.female-copy {
+  position: absolute;
+  right: 762px;
+  top: 81px;
+  color: #fff;
+  font-size: 43px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+.female-photo {
+  position: absolute;
+  right: 109px;
+  top: 63px;
+  width: 358px;
+  height: 314px;
+  border-radius: 32px;
+}
+.communal-row {
+  height: 261px;
+  display: flex;
+  align-items: center;
+  padding: 22px 69px 0 80px;
+  gap: 47px;
+}
+.communal-photos {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.kitchen-photo {
+  width: 400px;
+  height: 341px;
+  border-radius: 33px;
+  margin-top: 10px;
+}
+.bathroom-photo {
+  width: 280px;
+  height: 270px;
+  border-radius: 33px;
+}
+.communal-copy {
+  margin-left: auto;
+  width: 875px;
+  text-align: center;
+  align-self: flex-start;
+}
+.communal-copy h2 {
+  margin: -5px 0 53px;
+  font-size: 44px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+.communal-cta {
+  gap: 35px;
+}
+.cta-btn.small {
+  width: 216px;
+  height: 78px;
+  font-size: 15px;
+}
+
