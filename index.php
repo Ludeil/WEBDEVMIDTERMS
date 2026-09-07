@@ -27,8 +27,8 @@ $pageTitle = 'Obeda Dormitories';
         <img src="assets/images/logo-dark.svg" alt="Logo image dark">
     </a>
     <nav class="main-nav" aria-label="Main navigation">
-        <a class="active" href="#home">HOME</a>
-        <a href="#about">ABOUT US</a>
+        <a class="active" href="#home">Home</a>
+        <a href="#about">About us</a>
         <a href="#rooms">Rooms &amp; Amenities</a>
         <a href="#gallery">Gallery</a>
         <a href="#contact">Contact &amp; Location</a>

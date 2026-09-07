@@ -100,3 +100,13 @@
   right: 65px;
   bottom: 136px;
 }
+
+.main-nav a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+  color: white;
+}
