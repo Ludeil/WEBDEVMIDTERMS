@@ -15,6 +15,3 @@ git push
 # if dili mo connect sa server
 
 git ls-remote origin
-
-git log --oneline
-git checkout (code)
