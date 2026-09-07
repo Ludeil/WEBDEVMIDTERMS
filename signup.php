@@ -2,6 +2,11 @@
 session_start();
 require 'database/config.php';
 
+if (isset($_SESSION['user_id'])) {
+    header('Location: ' . (($_SESSION['role'] ?? '') === 'admin' ? 'admin/dashboard.php' : 'customer/dashboard.php'));
+    exit;
+}
+
 $status  = $_GET['status'] ?? null;
 $message = $_GET['message'] ?? null;
 
@@ -29,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = getConnection();
-
             $check = $pdo->prepare('SELECT id FROM users WHERE email = :email OR username = :username LIMIT 1');
             $check->execute(['email' => $email, 'username' => $username]);
 
@@ -66,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | Obeda Dormitories</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/signup.css">
 </head>
@@ -90,36 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="signup.php" autocomplete="on">
                 <div class="form-grid">
-                    <div>
-                        <label for="first_name">First Name *</label>
-                        <input id="first_name" name="first_name" type="text" required maxlength="100" value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>">
-                    </div>
-                    <div>
-                        <label for="last_name">Last Name *</label>
-                        <input id="last_name" name="last_name" type="text" required maxlength="100" value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>">
-                    </div>
-                    <div>
-                        <label for="username">Username *</label>
-                        <input id="username" name="username" type="text" required maxlength="50" autocomplete="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
-                    </div>
-                    <div>
-                        <label for="phone">Phone</label>
-                        <input id="phone" name="phone" type="tel" maxlength="30" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
-                    </div>
+                    <div><label for="first_name">First Name *</label><input id="first_name" name="first_name" type="text" required maxlength="100" value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>"></div>
+                    <div><label for="last_name">Last Name *</label><input id="last_name" name="last_name" type="text" required maxlength="100" value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>"></div>
+                    <div><label for="username">Username *</label><input id="username" name="username" type="text" required maxlength="50" autocomplete="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"></div>
+                    <div><label for="phone">Phone</label><input id="phone" name="phone" type="tel" maxlength="30" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"></div>
                 </div>
-
-                <label for="email">Email *</label>
-                <input id="email" name="email" type="email" required maxlength="255" autocomplete="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
-
-                <label for="password">Password *</label>
-                <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password">
-
-                <label for="confirm_password">Confirm Password *</label>
-                <input id="confirm_password" name="confirm_password" type="password" required minlength="8" autocomplete="new-password">
-
+                <label for="email">Email *</label><input id="email" name="email" type="email" required maxlength="255" autocomplete="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                <label for="password">Password *</label><input id="password" name="password" type="password" required minlength="8" autocomplete="new-password">
+                <label for="confirm_password">Confirm Password *</label><input id="confirm_password" name="confirm_password" type="password" required minlength="8" autocomplete="new-password">
                 <button type="submit" class="login-button">Create Account</button>
             </form>
-
             <p class="account-note">Already have an account? <a href="login.php">Sign in</a></p>
         </section>
     </main>

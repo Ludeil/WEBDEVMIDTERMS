@@ -2,7 +2,13 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    if (($_SESSION['role'] ?? '') === 'admin') {
+        header('Location: admin/dashboard.php');
+    } elseif (in_array($_SESSION['role'] ?? '', ['applicant', 'resident'], true)) {
+        header('Location: customer/dashboard.php');
+    } else {
+        header('Location: index.php');
+    }
     exit;
 }
 
@@ -17,7 +23,7 @@ $message = $_GET['message'] ?? null;
     <meta name="description" content="Sign in to your Obeda Dormitories account.">
     <title>Sign In | Obeda Dormitories</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/login.css">
 </head>
@@ -53,25 +59,10 @@ $message = $_GET['message'] ?? null;
 
                 <form method="POST" action="login_process.php" autocomplete="on">
                     <label for="login">Email or Username</label>
-                    <input
-                        id="login"
-                        name="login"
-                        type="text"
-                        required
-                        maxlength="255"
-                        autocomplete="username"
-                        placeholder="Enter your email or username"
-                    >
+                    <input id="login" name="login" type="text" required maxlength="255" autocomplete="username" placeholder="Enter your email or username">
 
                     <label for="password">Password</label>
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        required
-                        autocomplete="current-password"
-                        placeholder="Enter your password"
-                    >
+                    <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Enter your password">
 
                     <button type="submit" class="login-button">Sign In</button>
                 </form>

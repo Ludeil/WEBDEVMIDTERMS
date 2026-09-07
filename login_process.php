@@ -18,14 +18,18 @@ if ($login === '' || $password === '') {
 try {
     $pdo = getConnection();
 
+    // Use two placeholders. With native PDO prepares, the same named
+    // placeholder should not be reused for two separate parameter positions.
     $sql = "SELECT id, username, email, password_hash, first_name, last_name, role, account_status
             FROM users
-            WHERE email = :login OR username = :login
+            WHERE email = :login_email OR username = :login_username
             LIMIT 1";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':login', $login, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt->execute([
+        'login_email' => $login,
+        'login_username' => $login,
+    ]);
     $user = $stmt->fetch();
 
     if (!$user || !password_verify($password, $user['password_hash'])) {
@@ -38,17 +42,26 @@ try {
         exit;
     }
 
+    if (!in_array($user['role'], ['admin', 'applicant', 'resident'], true)) {
+        header('Location: login.php?status=error&message=' . urlencode('This account has an invalid role.'));
+        exit;
+    }
+
     session_regenerate_id(true);
 
-    $_SESSION['user_id']       = (int) $user['id'];
-    $_SESSION['username']      = $user['username'];
-    $_SESSION['email']         = $user['email'];
-    $_SESSION['first_name']    = $user['first_name'];
-    $_SESSION['last_name']     = $user['last_name'];
-    $_SESSION['role']          = $user['role'];
-    $_SESSION['logged_in']     = true;
+    $_SESSION['user_id']    = (int) $user['id'];
+    $_SESSION['username']   = $user['username'];
+    $_SESSION['email']      = $user['email'];
+    $_SESSION['first_name'] = $user['first_name'];
+    $_SESSION['last_name']  = $user['last_name'];
+    $_SESSION['role']       = $user['role'];
+    $_SESSION['logged_in']  = true;
 
-    header('Location: index.php');
+    if ($user['role'] === 'admin') {
+        header('Location: admin/dashboard.php');
+    } else {
+        header('Location: customer/dashboard.php');
+    }
     exit;
 } catch (PDOException $e) {
     header('Location: login.php?status=error&message=' . urlencode('Unable to sign in right now. Please try again.'));

@@ -8,7 +8,7 @@ function getConnection(): PDO
     $pass = '';
 
     try {
-        $pdo = new PDO(
+        return new PDO(
             "mysql:host=$host;dbname=$db;charset=utf8mb4",
             $user,
             $pass,
@@ -18,8 +18,6 @@ function getConnection(): PDO
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]
         );
-
-        return $pdo;
     } catch (PDOException $e) {
         die('Database connection failed. Please check the database configuration.');
     }
