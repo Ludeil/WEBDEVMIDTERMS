@@ -1,11 +1,245 @@
 <?php
-session_start(); require '../database/config.php'; require '../includes/auth.php'; requireCustomer();
-$pdo=getConnection(); $message=null; $status=null;
-if($_SERVER['REQUEST_METHOD']==='POST'){
- $d=(int)($_POST['dormitory_id']??0); $date=$_POST['preferred_date']??''; $time=$_POST['preferred_time']??''; $notes=trim($_POST['notes']??'');
- if($d && $date!=='' && $time!==''){ $s=$pdo->prepare('INSERT INTO viewing_requests(user_id,dormitory_id,preferred_date,preferred_time,notes) VALUES(:u,:d,:date,:time,:notes)'); $s->execute(['u'=>$_SESSION['user_id'],'d'=>$d,'date'=>$date,'time'=>$time,'notes'=>$notes?:null]); header('Location: dashboard.php?status=success&message='.urlencode('Viewing request submitted for administrator review.')); exit; }
- $status='error'; $message='Please complete the required fields.';
+
+session_start();
+
+require '../database/config.php';
+require '../includes/auth.php';
+
+requireCustomer();
+
+$pdo = getConnection();
+
+$message = null;
+$status = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $d = (int) ($_POST['dormitory_id'] ?? 0);
+    $date = $_POST['preferred_date'] ?? '';
+    $time = $_POST['preferred_time'] ?? '';
+    $notes = trim($_POST['notes'] ?? '');
+
+    if ($d && $date !== '' && $time !== '') {
+
+        $s = $pdo->prepare(
+            'INSERT INTO viewing_requests(
+                user_id,
+                dormitory_id,
+                preferred_date,
+                preferred_time,
+                notes
+            ) VALUES(
+                :u,
+                :d,
+                :date,
+                :time,
+                :notes
+            )'
+        );
+
+        $s->execute([
+            'u' => $_SESSION['user_id'],
+            'd' => $d,
+            'date' => $date,
+            'time' => $time,
+            'notes' => $notes ?: null
+        ]);
+
+        header(
+            'Location: dashboard.php?status=success&message=' .
+            urlencode(
+                'Viewing request submitted for administrator review.'
+            )
+        );
+
+        exit;
+
+    }
+
+    $status = 'error';
+    $message = 'Please complete the required fields.';
 }
-$dorms=$pdo->query("SELECT id,name,location FROM dormitories WHERE status='active' ORDER BY location")->fetchAll(); $today=date('Y-m-d');
+
+$dorms = $pdo->query(
+    "SELECT
+        id,
+        name,
+        location
+     FROM dormitories
+     WHERE status = 'active'
+     ORDER BY location"
+)->fetchAll();
+
+$today = date('Y-m-d');
+
 ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schedule Viewing | Obeda Dormitories</title><link rel="stylesheet" href="../assets/css/customer.css"></head><body><header class="customer-header"><a href="../index.php"><img src="../assets/images/logo-dark.svg" alt="Obeda Dormitories"></a><nav><a href="dashboard.php">Dashboard</a><a class="active" href="viewing.php">Viewing</a><a href="rooms.php">Rooms</a><a href="application.php">My Applications</a><a href="profile.php">Profile</a></nav><div><span><?=h($_SESSION['first_name'])?></span><a href="../logout.php">Logout</a></div></header><main class="customer-main narrow"><h1>Schedule a Viewing</h1><?php if($message): ?><div class="alert error"><?=h($message)?></div><?php endif; ?><section class="panel"><form method="post"><label>Dormitory *</label><select name="dormitory_id" required><option value="">Choose a location</option><?php foreach($dorms as $d): ?><option value="<?=h((string)$d['id'])?>"><?=h($d['location'])?> — <?=h($d['name'])?></option><?php endforeach; ?></select><label>Preferred Date *</label><input type="date" name="preferred_date" min="<?=h($today)?>" required><label>Preferred Time *</label><input type="time" name="preferred_time" required><label>Notes</label><textarea name="notes" placeholder="Optional message for the administrator"></textarea><button class="button" type="submit">Submit Viewing Request</button></form></section></main></body></html>
+
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Schedule Viewing | Obeda Dormitories
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/customer.css"
+    >
+
+</head>
+
+<body>
+
+<header class="customer-header">
+
+    <a href="../index.php">
+
+        <img
+            src="../assets/images/logo-dark.svg"
+            alt="Obeda Dormitories"
+        >
+
+    </a>
+
+    <nav>
+
+        <a href="dashboard.php">
+            Dashboard
+        </a>
+
+        <a
+            class="active"
+            href="viewing.php"
+        >
+            Viewing
+        </a>
+
+        <a href="rooms.php">
+            Rooms
+        </a>
+
+        <a href="application.php">
+            My Applications
+        </a>
+
+        <a href="profile.php">
+            Profile
+        </a>
+
+    </nav>
+
+    <div>
+
+        <span>
+            <?= h($_SESSION['first_name']) ?>
+        </span>
+
+        <a href="../logout.php">
+            Logout
+        </a>
+
+    </div>
+
+</header>
+
+<main class="customer-main narrow">
+
+    <h1>
+        Schedule a Viewing
+    </h1>
+
+    <?php if ($message): ?>
+
+        <div class="alert error">
+            <?= h($message) ?>
+        </div>
+
+    <?php endif; ?>
+
+    <section class="panel">
+
+        <form method="post">
+
+            <label>
+                Dormitory *
+            </label>
+
+            <select
+                name="dormitory_id"
+                required
+            >
+
+                <option value="">
+                    Choose a location
+                </option>
+
+                <?php foreach ($dorms as $d): ?>
+
+                    <option
+                        value="<?= h((string) $d['id']) ?>"
+                    >
+                        <?= h($d['location']) ?>
+                        —
+                        <?= h($d['name']) ?>
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
+            <label>
+                Preferred Date *
+            </label>
+
+            <input
+                type="date"
+                name="preferred_date"
+                min="<?= h($today) ?>"
+                required
+            >
+
+            <label>
+                Preferred Time *
+            </label>
+
+            <input
+                type="time"
+                name="preferred_time"
+                required
+            >
+
+            <label>
+                Notes
+            </label>
+
+            <textarea
+                name="notes"
+                placeholder="Optional message for the administrator"
+            ></textarea>
+
+            <button
+                class="button"
+                type="submit"
+            >
+                Submit Viewing Request
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>
+
