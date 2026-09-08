@@ -1,4 +1,3 @@
-
 <?php
 
 session_start();
@@ -847,4 +846,4 @@ $rows = $pdo->query(
 </body>
 
 </html>
-```
+
