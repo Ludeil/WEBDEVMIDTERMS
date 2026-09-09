@@ -58,11 +58,12 @@ function consumeRoomSlot(PDO $pdo, int $roomId): void
          SET
             available_slots = available_slots - 1,
             status = CASE
-                WHEN available_slots - 1 <= 0 THEN 'full'
+                WHEN available_slots = 1 THEN 'full'
                 ELSE 'available'
             END
          WHERE id = :id
-         AND available_slots > 0"
+         AND status = 'available'
+         AND available_slots >= 1"
     );
 
     $stmt->execute([
@@ -71,7 +72,7 @@ function consumeRoomSlot(PDO $pdo, int $roomId): void
 
     if ($stmt->rowCount() !== 1) {
         throw new RuntimeException(
-            'The selected room has no available slots.'
+            'The selected room is not available or has no available slots.'
         );
     }
 }
@@ -84,7 +85,7 @@ function restoreRoomSlot(PDO $pdo, int $roomId): void
             available_slots = LEAST(capacity, available_slots + 1),
             status = CASE
                 WHEN status = 'maintenance' THEN 'maintenance'
-                WHEN available_slots + 1 >= capacity THEN 'available'
+                WHEN status = 'inactive' THEN 'inactive'
                 ELSE 'available'
             END
          WHERE id = :id"
@@ -345,6 +346,8 @@ $rooms = $pdo->query(
      JOIN dormitories d
         ON d.id = r.dormitory_id
      WHERE d.status = 'active'
+     AND r.status = 'available'
+     AND r.available_slots > 0
      ORDER BY d.location, r.room_number"
 )->fetchAll();
 
