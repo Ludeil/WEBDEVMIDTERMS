@@ -183,6 +183,9 @@ small {
 .status.pending {
   background: #fff2cc;
 }
+.status.moved_out {
+  background: #e8e8e8;
+}
 .status.confirmed,
 .status.completed,
 .status.approved,

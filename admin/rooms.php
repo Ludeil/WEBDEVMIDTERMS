@@ -32,116 +32,217 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
 
-        if ($action === 'create' || ($action === 'update' && $id)) {
+if ($action === 'create' || ($action === 'update' && $id)) {
 
-            $dormitoryId = (int) ($_POST['dormitory_id'] ?? 0);
-            $roomNumber = trim($_POST['room_number'] ?? '');
-            $roomType = $_POST['room_type'] ?? '4_person';
-            $capacity = max(1, (int) ($_POST['capacity'] ?? 4));
-            $rate = max(0, (float) ($_POST['monthly_rate'] ?? 0));
-            $slots = max(
-                0,
-                min(
-                    $capacity,
-                    (int) ($_POST['available_slots'] ?? 0)
-                )
+    $dormitoryId = filter_input(
+        INPUT_POST,
+        'dormitory_id',
+        FILTER_VALIDATE_INT
+    );
+
+    $roomNumber = trim($_POST['room_number'] ?? '');
+    $roomType = $_POST['room_type'] ?? '4_person';
+
+    $capacity = filter_input(
+        INPUT_POST,
+        'capacity',
+        FILTER_VALIDATE_INT
+    );
+
+    $slots = filter_input(
+        INPUT_POST,
+        'available_slots',
+        FILTER_VALIDATE_INT
+    );
+
+    $rate = filter_var(
+        $_POST['monthly_rate'] ?? 0,
+        FILTER_VALIDATE_FLOAT
+    );
+
+    $roomStatus = $_POST['status']
+        ?? (($slots ?? 0) > 0 ? 'available' : 'full');
+
+    /*
+     * Basic validation
+     */
+    if (
+        !$dormitoryId ||
+        $roomNumber === '' ||
+        !isset($types[$roomType]) ||
+        !in_array($roomStatus, $statuses, true)
+    ) {
+        throw new RuntimeException(
+            'Please provide valid room details.'
+        );
+    }
+
+    if ($capacity === false || $capacity < 1) {
+        throw new RuntimeException(
+            'Room capacity must be at least 1.'
+        );
+    }
+
+    if ($slots === false || $slots < 0) {
+        throw new RuntimeException(
+            'Available slots cannot be negative.'
+        );
+    }
+
+    if ($slots > $capacity) {
+        throw new RuntimeException(
+            'Available slots cannot be greater than room capacity.'
+        );
+    }
+
+    if ($rate === false || $rate < 0) {
+        throw new RuntimeException(
+            'Monthly rate cannot be negative.'
+        );
+    }
+
+    /*
+     * Status must match the number of available slots.
+     */
+    if ($roomStatus === 'available' && $slots < 1) {
+        throw new RuntimeException(
+            'An available room must have at least 1 available slot.'
+        );
+    }
+
+    if ($roomStatus === 'full' && $slots !== 0) {
+        throw new RuntimeException(
+            'A full room must have 0 available slots.'
+        );
+    }
+
+    /*
+     * Verify that the selected dormitory exists
+     * and is active.
+     */
+    $checkDorm = $pdo->prepare(
+        "SELECT id
+         FROM dormitories
+         WHERE id = :id
+         AND status = 'active'"
+    );
+
+    $checkDorm->execute([
+        'id' => $dormitoryId
+    ]);
+
+    if (!$checkDorm->fetch()) {
+        throw new RuntimeException(
+            'Please choose an active dormitory.'
+        );
+    }
+
+    /*
+     * When editing a room, make sure the new capacity
+     * cannot be smaller than the number of occupants
+     * already using the room.
+     */
+    if ($action === 'update') {
+
+        $checkRoom = $pdo->prepare(
+            "SELECT
+                capacity,
+                available_slots
+             FROM rooms
+             WHERE id = :id
+             FOR UPDATE"
+        );
+
+        $checkRoom->execute([
+            'id' => $id
+        ]);
+
+        $existingRoom = $checkRoom->fetch();
+
+        if (!$existingRoom) {
+            throw new RuntimeException(
+                'Room not found.'
             );
+        }
 
-            $roomStatus = $_POST['status']
-                ?? ($slots > 0 ? 'available' : 'full');
+        $currentOccupants =
+            (int) $existingRoom['capacity'] -
+            (int) $existingRoom['available_slots'];
 
-            if (
-                !$dormitoryId ||
-                $roomNumber === '' ||
-                !isset($types[$roomType]) ||
-                !in_array($roomStatus, $statuses, true)
-            ) {
-                throw new RuntimeException(
-                    'Please provide valid room details.'
-                );
-            }
-
-            $checkDorm = $pdo->prepare(
-                "SELECT id
-                 FROM dormitories
-                 WHERE id = :id
-                 AND status = 'active'"
+        if ($capacity < $currentOccupants) {
+            throw new RuntimeException(
+                'Room capacity cannot be smaller than the number of current occupants.'
             );
+        }
+    }
 
-            $checkDorm->execute([
-                'id' => $dormitoryId
-            ]);
+    /*
+     * Create room
+     */
+    if ($action === 'create') {
 
-            if (!$checkDorm->fetch()) {
-                throw new RuntimeException(
-                    'Please choose an active dormitory.'
-                );
-            }
+        $stmt = $pdo->prepare(
+            'INSERT INTO rooms(
+                dormitory_id,
+                room_number,
+                room_type,
+                capacity,
+                monthly_rate,
+                available_slots,
+                status
+            ) VALUES(
+                :d,
+                :n,
+                :t,
+                :c,
+                :r,
+                :s,
+                :status
+            )'
+        );
 
-            if ($action === 'create') {
+        $stmt->execute([
+            'd' => $dormitoryId,
+            'n' => $roomNumber,
+            't' => $roomType,
+            'c' => $capacity,
+            'r' => $rate,
+            's' => $slots,
+            'status' => $roomStatus
+        ]);
 
-                $stmt = $pdo->prepare(
-                    'INSERT INTO rooms(
-                        dormitory_id,
-                        room_number,
-                        room_type,
-                        capacity,
-                        monthly_rate,
-                        available_slots,
-                        status
-                    ) VALUES(
-                        :d,
-                        :n,
-                        :t,
-                        :c,
-                        :r,
-                        :s,
-                        :status
-                    )'
-                );
+        $message = 'Room added successfully.';
 
-                $stmt->execute([
-                    'd' => $dormitoryId,
-                    'n' => $roomNumber,
-                    't' => $roomType,
-                    'c' => $capacity,
-                    'r' => $rate,
-                    's' => $slots,
-                    'status' => $roomStatus
-                ]);
+    } else {
 
-                $message = 'Room added successfully.';
+        $stmt = $pdo->prepare(
+            'UPDATE rooms
+             SET
+                dormitory_id = :d,
+                room_number = :n,
+                room_type = :t,
+                capacity = :c,
+                monthly_rate = :r,
+                available_slots = :s,
+                status = :status
+             WHERE id = :id'
+        );
 
-            } else {
+        $stmt->execute([
+            'd' => $dormitoryId,
+            'n' => $roomNumber,
+            't' => $roomType,
+            'c' => $capacity,
+            'r' => $rate,
+            's' => $slots,
+            'status' => $roomStatus,
+            'id' => $id
+        ]);
 
-                $stmt = $pdo->prepare(
-                    'UPDATE rooms
-                     SET
-                        dormitory_id = :d,
-                        room_number = :n,
-                        room_type = :t,
-                        capacity = :c,
-                        monthly_rate = :r,
-                        available_slots = :s,
-                        status = :status
-                     WHERE id = :id'
-                );
+        $message = 'Room updated successfully.';
+    }
 
-                $stmt->execute([
-                    'd' => $dormitoryId,
-                    'n' => $roomNumber,
-                    't' => $roomType,
-                    'c' => $capacity,
-                    'r' => $rate,
-                    's' => $slots,
-                    'status' => $roomStatus,
-                    'id' => $id
-                ]);
-
-                $message = 'Room updated successfully.';
-            }
-
-        } elseif ($action === 'delete' && $id) {
+} elseif ($action === 'delete' && $id) {
 
             $check = $pdo->prepare(
                 'SELECT COUNT(*)

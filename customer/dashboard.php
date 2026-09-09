@@ -224,11 +224,19 @@ $message = $_GET['message'] ?? null;
                     </strong>
 
                     <span>
-                        <?= h(
+                        Move-in: <?= h(
                             $r['move_in_date']
-                            ?: 'No move-in date'
+                            ?: 'Not specified'
                         ) ?>
                     </span>
+
+                    <?php if ($r['move_out_date']): ?>
+
+                        <span>
+                            Move-out: <?= h($r['move_out_date']) ?>
+                        </span>
+
+                    <?php endif; ?>
 
                     <span
                         class="status <?= h($r['status']) ?>"

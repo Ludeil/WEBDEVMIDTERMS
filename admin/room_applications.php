@@ -79,6 +79,28 @@ function consumeRoomSlot(PDO $pdo, int $roomId): void
 
 function restoreRoomSlot(PDO $pdo, int $roomId): void
 {
+    $check = $pdo->prepare(
+        'SELECT
+            available_slots,
+            capacity,
+            status
+         FROM rooms
+         WHERE id = :id
+         FOR UPDATE'
+    );
+
+    $check->execute([
+        'id' => $roomId
+    ]);
+
+    $room = $check->fetch();
+
+    if (!$room) {
+        throw new RuntimeException(
+            'The room associated with this application no longer exists.'
+        );
+    }
+
     $stmt = $pdo->prepare(
         "UPDATE rooms
          SET
@@ -86,6 +108,7 @@ function restoreRoomSlot(PDO $pdo, int $roomId): void
             status = CASE
                 WHEN status = 'maintenance' THEN 'maintenance'
                 WHEN status = 'inactive' THEN 'inactive'
+                WHEN available_slots + 1 >= capacity THEN 'available'
                 ELSE 'available'
             END
          WHERE id = :id"
@@ -94,6 +117,29 @@ function restoreRoomSlot(PDO $pdo, int $roomId): void
     $stmt->execute([
         'id' => $roomId
     ]);
+}
+
+function validateMoveOutDate(string $moveOutDate, ?string $moveInDate = null): string
+{
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $moveOutDate);
+
+    if (!$date || $date->format('Y-m-d') !== $moveOutDate) {
+        throw new RuntimeException(
+            'Please provide a valid move-out date.'
+        );
+    }
+
+    if ($moveInDate) {
+        $moveIn = DateTimeImmutable::createFromFormat('!Y-m-d', $moveInDate);
+
+        if ($moveIn && $date < $moveIn) {
+            throw new RuntimeException(
+                'Move-out date cannot be earlier than the move-in date.'
+            );
+        }
+    }
+
+    return $date->format('Y-m-d');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -107,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $oldUserId = 0;
 
-        if ($action === 'update' || $action === 'delete') {
+        if ($action === 'update' || $action === 'delete' || $action === 'move_out') {
 
             if (!$id) {
                 throw new RuntimeException(
@@ -137,7 +183,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $oldUserId = (int) $old['user_id'];
         }
 
-        if ($action === 'create') {
+        if ($action === 'move_out') {
+
+            if ($old['status'] !== 'approved') {
+                throw new RuntimeException(
+                    'Only an approved tenant can be marked as moved out.'
+                );
+            }
+
+            $moveOut = trim($_POST['move_out_date'] ?? '');
+            $moveOut = validateMoveOutDate(
+                $moveOut,
+                $old['move_in_date'] ?: null
+            );
+
+            restoreRoomSlot(
+                $pdo,
+                (int) $old['room_id']
+            );
+
+            $upd = $pdo->prepare(
+                "UPDATE room_applications
+                 SET
+                    status = 'moved_out',
+                    move_out_date = :move_out
+                 WHERE id = :id"
+            );
+
+            $upd->execute([
+                'move_out' => $moveOut,
+                'id' => $id
+            ]);
+
+            syncResidentRole($pdo, $oldUserId);
+
+            $message = 'Tenant marked as moved out successfully.';
+
+        } elseif ($action === 'create') {
 
             $userId = (int) ($_POST['user_id'] ?? 0);
             $roomId = (int) ($_POST['room_id'] ?? 0);
@@ -202,6 +284,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ) {
                 throw new RuntimeException(
                     'Please provide valid application details.'
+                );
+            }
+
+            if ($old['status'] === 'moved_out') {
+                throw new RuntimeException(
+                    'Moved-out records are historical records and cannot be edited.'
                 );
             }
 
@@ -346,8 +434,6 @@ $rooms = $pdo->query(
      JOIN dormitories d
         ON d.id = r.dormitory_id
      WHERE d.status = 'active'
-     AND r.status = 'available'
-     AND r.available_slots > 0
      ORDER BY d.location, r.room_number"
 )->fetchAll();
 
@@ -373,7 +459,8 @@ $rows = $pdo->query(
             'pending',
             'approved',
             'rejected',
-            'cancelled'
+            'cancelled',
+            'moved_out'
         ),
         ra.created_at DESC"
 )->fetchAll();
@@ -697,6 +784,10 @@ $rows = $pdo->query(
                         </th>
 
                         <th>
+                            Move-out
+                        </th>
+
+                        <th>
                             Notes
                         </th>
 
@@ -760,6 +851,15 @@ $rows = $pdo->query(
                             <td>
 
                                 <?= h(
+                                    $r['move_out_date']
+                                    ?: '—'
+                                ) ?>
+
+                            </td>
+
+                            <td>
+
+                                <?= h(
                                     $r['notes']
                                     ?: '—'
                                 ) ?>
@@ -780,43 +880,99 @@ $rows = $pdo->query(
 
                             <td class="action-cell">
 
-                                <a
-                                    class="secondary-button"
-                                    href="room_applications.php?edit=<?= h(
-                                        (string) $r['id']
-                                    ) ?>"
-                                >
-                                    Edit
-                                </a>
+                                <?php if ($r['status'] === 'approved'): ?>
 
-                                <form
-                                    method="post"
-                                    class="inline-form"
-                                    onsubmit="return confirm('Delete this application? Approved applications restore one room slot.');"
-                                >
-
-                                    <input
-                                        type="hidden"
-                                        name="action"
-                                        value="delete"
+                                    <form
+                                        method="post"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Mark this tenant as moved out? The room will regain one available slot.');"
                                     >
 
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?= h(
+                                        <input
+                                            type="hidden"
+                                            name="action"
+                                            value="move_out"
+                                        >
+
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?= h(
+                                                (string) $r['id']
+                                            ) ?>"
+                                        >
+
+                                        <input
+                                            type="date"
+                                            name="move_out_date"
+                                            value="<?= h(date('Y-m-d')) ?>"
+                                            min="<?= h($r['move_in_date'] ?? '') ?>"
+                                            required
+                                        >
+
+                                        <button
+                                            class="secondary-button"
+                                            type="submit"
+                                        >
+                                            Mark Moved Out
+                                        </button>
+
+                                    </form>
+
+                                    <a
+                                        class="secondary-button"
+                                        href="room_applications.php?edit=<?= h(
                                             (string) $r['id']
                                         ) ?>"
                                     >
+                                        Edit
+                                    </a>
 
-                                    <button
-                                        class="danger-button"
-                                        type="submit"
+                                <?php elseif ($r['status'] !== 'moved_out'): ?>
+
+                                    <a
+                                        class="secondary-button"
+                                        href="room_applications.php?edit=<?= h(
+                                            (string) $r['id']
+                                        ) ?>"
                                     >
-                                        Delete
-                                    </button>
+                                        Edit
+                                    </a>
 
-                                </form>
+                                <?php endif; ?>
+
+                                <?php if ($r['status'] !== 'moved_out'): ?>
+
+                                    <form
+                                        method="post"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Delete this application? Approved applications restore one room slot.');"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="action"
+                                            value="delete"
+                                        >
+
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?= h(
+                                                (string) $r['id']
+                                            ) ?>"
+                                        >
+
+                                        <button
+                                            class="danger-button"
+                                            type="submit"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                <?php endif; ?>
 
                             </td>
 
@@ -828,7 +984,7 @@ $rows = $pdo->query(
 
                         <tr>
 
-                            <td colspan="6">
+                            <td colspan="7">
                                 No room applications yet.
                             </td>
 
